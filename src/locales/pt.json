@@ -1,0 +1,32 @@
+{
+  "header": {
+    "title": "Bússola da Vida"
+  },
+  "wheelControls": {
+    "title": "Personalize Sua Vida",
+    "description": "Ajuste cada área da sua vida para refletir sua satisfação atual.",
+    "score": "Pontuação",
+    "addArea": "Adicionar Nova Área",
+    "newArea": "Nova Área",
+    "getSuggestions": "Gerar Sugestões de IA"
+  },
+  "aiSuggestions": {
+    "title": "Seu Plano de Ação Personalizado",
+    "description": "Aqui estão algumas sugestões da IA para ajudá-lo a encontrar mais equilíbrio e satisfação em sua vida.",
+    "strategies": "Estratégias",
+    "activities": "Atividades"
+  },
+  "areas": {
+    "career": "Carreira",
+    "finances": "Finanças",
+    "health": "Saúde",
+    "friendsFamily": "Amigos e Família",
+    "romance": "Romance",
+    "personalGrowth": "Crescimento Pessoal",
+    "funRecreation": "Lazer e Recreação",
+    "environment": "Ambiente"
+  },
+  "error": {
+    "title": "Erro"
+  }
+}

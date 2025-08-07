@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '../ui/scroll-area';
+import { useI18n } from '@/hooks/use-i18n';
 
 interface WheelControlsProps {
   areas: LifeArea[];
@@ -24,6 +25,8 @@ const defaultColors = [
 ];
 
 export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingSuggestions }: WheelControlsProps) {
+  const { t } = useI18n();
+
   const updateArea = (id: string, updatedValues: Partial<LifeArea>) => {
     setAreas((prev) => prev.map((area) => (area.id === id ? { ...area, ...updatedValues } : area)));
   };
@@ -32,7 +35,7 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
     const newColor = defaultColors[areas.length % defaultColors.length] || '#CCCCCC';
     setAreas((prev) => [
       ...prev,
-      { id: uuidv4(), name: 'New Area', score: 5, color: newColor },
+      { id: uuidv4(), name: t('wheelControls.newArea'), score: 5, color: newColor },
     ]);
   };
 
@@ -43,8 +46,8 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
   return (
     <Card className="sticky top-20">
       <CardHeader>
-        <CardTitle>Customize Your Life</CardTitle>
-        <CardDescription>Adjust each area of your life to reflect your current satisfaction.</CardDescription>
+        <CardTitle>{t('wheelControls.title')}</CardTitle>
+        <CardDescription>{t('wheelControls.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[45vh] pr-4">
@@ -73,7 +76,7 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <Label htmlFor={`score-${area.id}`}>Score</Label>
+                    <Label htmlFor={`score-${area.id}`}>{t('wheelControls.score')}</Label>
                     <span className="text-sm font-bold w-8 h-8 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
                       {area.score}
                     </span>
@@ -91,7 +94,7 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
             ))}
             <Button variant="outline" className="w-full" onClick={addArea}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Add New Area
+                {t('wheelControls.addArea')}
             </Button>
           </div>
         </ScrollArea>
@@ -103,7 +106,7 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
           ) : (
             <Sparkles className="mr-2 h-4 w-4" />
           )}
-          Generate AI Suggestions
+          {t('wheelControls.getSuggestions')}
         </Button>
       </CardFooter>
     </Card>

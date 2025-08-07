@@ -13,6 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
+import { useI18n } from '@/hooks/use-i18n';
 
 interface AISuggestionsSheetProps {
   open: boolean;
@@ -29,6 +30,7 @@ export function AISuggestionsSheet({
   isLoading,
   error,
 }: AISuggestionsSheetProps) {
+  const { t } = useI18n();
   const renderLoadingState = () => (
     <div className="space-y-4 p-4">
       <Skeleton className="h-8 w-1/2" />
@@ -50,7 +52,7 @@ export function AISuggestionsSheet({
     <div className="p-4">
       <Alert variant="destructive">
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
+        <AlertTitle>{t('error.title')}</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
     </div>
@@ -60,9 +62,9 @@ export function AISuggestionsSheet({
     <ScrollArea className="h-full">
       <div className="p-1 md:p-4">
         <SheetHeader className="text-left">
-          <SheetTitle>Your Personalized Action Plan</SheetTitle>
+          <SheetTitle>{t('aiSuggestions.title')}</SheetTitle>
           <SheetDescription>
-            Here are some AI-powered suggestions to help you find more balance and satisfaction in your life.
+            {t('aiSuggestions.description')}
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-6 py-6">
@@ -73,11 +75,11 @@ export function AISuggestionsSheet({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-semibold mb-1">Strategies</h4>
+                  <h4 className="font-semibold mb-1">{t('aiSuggestions.strategies')}</h4>
                   <p className="text-muted-foreground text-sm">{suggestion.strategies}</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-1">Activities</h4>
+                  <h4 className="font-semibold mb-1">{t('aiSuggestions.activities')}</h4>
                   <p className="text-muted-foreground text-sm">{suggestion.activities}</p>
                 </div>
               </CardContent>

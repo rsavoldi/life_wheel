@@ -1,15 +1,16 @@
 import type { LifeArea } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+import { TFunction } from '@/hooks/use-i18n';
 
-export const INITIAL_LIFE_AREAS: LifeArea[] = [
-  { id: uuidv4(), name: 'Career', score: 7, color: '#FF6384' },
-  { id: uuidv4(), name: 'Finances', score: 5, color: '#36A2EB' },
-  { id: uuidv4(), name: 'Health', score: 8, color: '#FFCE56' },
-  { id: uuidv4(), name: 'Friends & Family', score: 9, color: '#4BC0C0' },
-  { id: uuidv4(), name: 'Romance', score: 6, color: '#9966FF' },
-  { id: uuidv4(), name: 'Personal Growth', score: 7, color: '#FF9F40' },
-  { id: uuidv4(), name: 'Fun & Recreation', score: 4, color: '#FF6384' },
-  { id: uuidv4(), name: 'Environment', score: 8, color: '#36A2EB' },
+export const getInitialLifeAreas = (t: TFunction): LifeArea[] => [
+  { id: uuidv4(), name: t('areas.career'), score: 7, color: '#FF6384' },
+  { id: uuidv4(), name: t('areas.finances'), score: 5, color: '#36A2EB' },
+  { id: uuidv4(), name: t('areas.health'), score: 8, color: '#FFCE56' },
+  { id: uuidv4(), name: t('areas.friendsFamily'), score: 9, color: '#4BC0C0' },
+  { id: uuidv4(), name: t('areas.romance'), score: 6, color: '#9966FF' },
+  { id: uuidv4(), name: t('areas.personalGrowth'), score: 7, color: '#FF9F40' },
+  { id: uuidv4(), name: t('areas.funRecreation'), score: 4, color: '#FF6384' },
+  { id: uuidv4(), name: t('areas.environment'), score: 8, color: '#36A2EB' },
 ];
 
 // Simple uuid v4 implementation to avoid adding a dependency

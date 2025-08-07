@@ -1,12 +1,14 @@
 'use client';
 
 import type { LifeArea } from '@/types';
+import type { Dispatch, SetStateAction } from 'react';
 
 interface WheelChartProps {
   areas: LifeArea[];
+  setAreas: Dispatch<SetStateAction<LifeArea[]>>;
 }
 
-export function WheelChart({ areas }: WheelChartProps) {
+export function WheelChart({ areas, setAreas }: WheelChartProps) {
   const SVG_SIZE = 600;
   const centerX = SVG_SIZE / 2;
   const centerY = SVG_SIZE / 2;
@@ -15,6 +17,14 @@ export function WheelChart({ areas }: WheelChartProps) {
   const numSlices = areas.length;
   if (numSlices === 0) return null;
 
+  const handleSliceClick = (areaId: string, level: number) => {
+    setAreas((prevAreas) =>
+      prevAreas.map((area) =>
+        area.id === areaId ? { ...area, score: level } : area
+      )
+    );
+  };
+  
   const getPathForSlice = (index: number, score: number): string => {
     const radius = (score / numLevels) * maxRadius;
     if (radius <= 0) return '';
@@ -49,40 +59,68 @@ export function WheelChart({ areas }: WheelChartProps) {
                     </radialGradient>
                 ))}
             </defs>
-            {/* Background Grid */}
+            {/* Background Grid & Clickable Areas */}
             <g opacity="0.5">
-                {Array.from({ length: numLevels }).map((_, i) => (
+                {Array.from({ length: numLevels }).map((_, i) => {
+                  const level = numLevels - i;
+                  const radius = (level / numLevels) * maxRadius;
+                  return (
                     <circle
                         key={`level-circle-${i}`}
                         cx={centerX}
                         cy={centerY}
-                        r={((i + 1) / numLevels) * maxRadius}
+                        r={radius}
                         fill="none"
                         stroke="hsl(var(--muted-foreground))"
                         strokeWidth="0.5"
                         strokeDasharray="2 4"
                     />
-                ))}
-                {areas.map((_, index) => {
+                )})}
+                {areas.map((area, index) => {
                     const angle = (index / numSlices) * 2 * Math.PI - Math.PI / 2;
                     const lineX = centerX + maxRadius * Math.cos(angle);
                     const lineY = centerY + maxRadius * Math.sin(angle);
                     return (
-                        <line
-                            key={`divider-${index}`}
-                            x1={centerX}
-                            y1={centerY}
-                            x2={lineX}
-                            y2={lineY}
-                            stroke="hsl(var(--muted-foreground))"
-                            strokeWidth="0.5"
-                        />
+                        <g key={`slice-grid-${area.id}`}>
+                          <line
+                              key={`divider-${index}`}
+                              x1={centerX}
+                              y1={centerY}
+                              x2={lineX}
+                              y2={lineY}
+                              stroke="hsl(var(--muted-foreground))"
+                              strokeWidth="0.5"
+                          />
+                          {/* Clickable regions */}
+                          {Array.from({ length: numLevels }).map((_, i) => {
+                                const level = i + 1;
+                                const path = getPathForSlice(index, level);
+                                const innerPath = getPathForSlice(index, level-1);
+
+                                const clipPathId = `clip-${area.id}-${level}`;
+                                return (
+                                  <g key={`clickable-${area.id}-${level}`}>
+                                    <clipPath id={clipPathId}>
+                                      <path d={path} />
+                                      {level > 1 && <path d={innerPath} fill="white" style={{transform: 'scale(1.01)', transformOrigin: 'center center'}} />}
+                                    </clipPath>
+                                    <path
+                                      d={path}
+                                      fill="transparent"
+                                      className="cursor-pointer"
+                                      onClick={() => handleSliceClick(area.id, level)}
+                                      // clipPath={`url(#${clipPathId})`}
+                                    />
+                                  </g>
+                                )
+                            })}
+                        </g>
                     );
                 })}
             </g>
             
             {/* Scored Slices */}
-            <g>
+            <g pointerEvents="none">
                 {areas.map((area, index) => (
                     <path
                         key={`slice-path-${area.id}`}
@@ -96,7 +134,7 @@ export function WheelChart({ areas }: WheelChartProps) {
             </g>
 
             {/* Labels */}
-            <g>
+            <g pointerEvents="none">
                 {areas.map((area, index) => {
                     const sliceAngle = (2 * Math.PI) / numSlices;
                     const midAngle = (index + 0.5) * sliceAngle - Math.PI / 2;

@@ -1,5 +1,6 @@
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Zap } from 'lucide-react';
+import LanguageSwitcher from './language-switcher';
 
 export function Header() {
   return (
@@ -10,6 +11,7 @@ export function Header() {
           <span className="font-bold">Life Compass</span>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <LanguageSwitcher />
           <ThemeToggle />
         </div>
       </div>

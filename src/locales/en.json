@@ -1,0 +1,32 @@
+{
+  "header": {
+    "title": "Life Compass"
+  },
+  "wheelControls": {
+    "title": "Customize Your Life",
+    "description": "Adjust each area of your life to reflect your current satisfaction.",
+    "score": "Score",
+    "addArea": "Add New Area",
+    "newArea": "New Area",
+    "getSuggestions": "Generate AI Suggestions"
+  },
+  "aiSuggestions": {
+    "title": "Your Personalized Action Plan",
+    "description": "Here are some AI-powered suggestions to help you find more balance and satisfaction in your life.",
+    "strategies": "Strategies",
+    "activities": "Activities"
+  },
+  "areas": {
+    "career": "Career",
+    "finances": "Finances",
+    "health": "Health",
+    "friendsFamily": "Friends & Family",
+    "romance": "Romance",
+    "personalGrowth": "Personal Growth",
+    "funRecreation": "Fun & Recreation",
+    "environment": "Environment"
+  },
+  "error": {
+    "title": "Error"
+  }
+}
