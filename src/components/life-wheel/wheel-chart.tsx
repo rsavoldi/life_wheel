@@ -146,6 +146,32 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                   ))}
               </g>
 
+               {/* Score Numbers */}
+               <g pointerEvents="none">
+                {areas.map((area, index) => {
+                  if (area.score === 0) return null;
+                  const sliceAngle = (2 * Math.PI) / numSlices;
+                  const midAngle = (index + 0.5) * sliceAngle - Math.PI / 2;
+                  const numberRadius = ((area.score / numLevels) * maxRadius) * 0.6 + 20;
+                  const numberX = centerX + numberRadius * Math.cos(midAngle);
+                  const numberY = centerY + numberRadius * Math.sin(midAngle);
+                  
+                  return (
+                    <text
+                      key={`score-number-${area.id}`}
+                      x={numberX}
+                      y={numberY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className="fill-foreground text-3xl font-bold opacity-30"
+                      transform={`rotate(${-rotation}, ${numberX}, ${numberY})`}
+                    >
+                      {area.score}
+                    </text>
+                  );
+                })}
+              </g>
+
               {/* Labels */}
               <g pointerEvents="none">
                   {areas.map((area, index) => {
