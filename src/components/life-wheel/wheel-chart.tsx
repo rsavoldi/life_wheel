@@ -17,10 +17,12 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
   const numSlices = areas.length;
   if (numSlices === 0) return null;
 
-  const handleSliceClick = (areaId: string, level: number) => {
+  const handleSliceClick = (areaId: string) => {
     setAreas((prevAreas) =>
       prevAreas.map((area) =>
-        area.id === areaId ? { ...area, score: level } : area
+        area.id === areaId 
+          ? { ...area, score: (area.score + 1) % 11 } 
+          : area
       )
     );
   };
@@ -92,28 +94,12 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                               strokeWidth="0.5"
                           />
                           {/* Clickable regions */}
-                          {Array.from({ length: numLevels }).map((_, i) => {
-                                const level = i + 1;
-                                const path = getPathForSlice(index, level);
-                                const innerPath = getPathForSlice(index, level-1);
-
-                                const clipPathId = `clip-${area.id}-${level}`;
-                                return (
-                                  <g key={`clickable-${area.id}-${level}`}>
-                                    <clipPath id={clipPathId}>
-                                      <path d={path} />
-                                      {level > 1 && <path d={innerPath} fill="white" style={{transform: 'scale(1.01)', transformOrigin: 'center center'}} />}
-                                    </clipPath>
-                                    <path
-                                      d={path}
-                                      fill="transparent"
-                                      className="cursor-pointer"
-                                      onClick={() => handleSliceClick(area.id, level)}
-                                      // clipPath={`url(#${clipPathId})`}
-                                    />
-                                  </g>
-                                )
-                            })}
+                           <path
+                              d={getPathForSlice(index, 10)}
+                              fill="transparent"
+                              className="cursor-pointer"
+                              onClick={() => handleSliceClick(area.id)}
+                            />
                         </g>
                     );
                 })}
