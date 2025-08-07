@@ -56,51 +56,46 @@ export default function LifeWheel() {
 
   const getChartAsBase64 = async (): Promise<string | null> => {
     if (!wheelChartRef.current) return null;
-    const svgElement = wheelChartRef.current.querySelector('svg');
-    if (!svgElement) return null;
     
-    // Create a clone of the div to avoid modifying the one in the DOM
-    const divToRender = wheelChartRef.current.cloneNode(true) as HTMLDivElement;
-    
-    // Apply styles to ensure it has a background
-    divToRender.style.backgroundColor = 'white';
-    divToRender.style.width = `${wheelChartRef.current.offsetWidth}px`;
-    divToRender.style.height = `${wheelChartRef.current.offsetHeight}px`;
-    divToRender.style.position = 'absolute';
-    divToRender.style.left = '-9999px'; // Render offscreen
-    
-    document.body.appendChild(divToRender);
+    // Create a clone of the SVG element to avoid modifying the one in the DOM
+    const originalSvgElement = wheelChartRef.current.querySelector('svg');
+    if (!originalSvgElement) return null;
+    const svgElement = originalSvgElement.cloneNode(true) as SVGSVGElement;
 
-    const svgString = new XMLSerializer().serializeToString(divToRender.querySelector('svg')!);
+    // Get computed styles from the browser
+    const computedStyle = getComputedStyle(document.body);
+    const foregroundColor = computedStyle.getPropertyValue('--foreground').trim();
+    const mutedForegroundColor = computedStyle.getPropertyValue('--muted-foreground').trim();
+
+    // Inline styles into the cloned SVG
+    const elementsToStyle = svgElement.querySelectorAll('[data-strokecolor], [data-fillcolor]');
+    elementsToStyle.forEach(el => {
+        const strokeColor = el.getAttribute('data-strokecolor');
+        const fillColor = el.getAttribute('data-fillcolor');
+        if(strokeColor === 'muted-foreground') el.setAttribute('stroke', `hsl(${mutedForegroundColor})`);
+        if(fillColor === 'foreground') el.setAttribute('fill', `hsl(${foregroundColor})`);
+        if(fillColor === 'muted-foreground') el.setAttribute('fill', `hsl(${mutedForegroundColor})`);
+    });
+
+    const svgString = new XMLSerializer().serializeToString(svgElement);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        document.body.removeChild(divToRender);
-        return null;
-    }
+    if (!ctx) return null;
     
-    const computedStyle = getComputedStyle(wheelChartRef.current);
-    canvas.width = wheelChartRef.current.offsetWidth;
-    canvas.height = wheelChartRef.current.offsetHeight;
+    canvas.width = originalSvgElement.viewBox.baseVal.width;
+    canvas.height = originalSvgElement.viewBox.baseVal.height;
     
     // Draw white background
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const v = await Canvg.from(ctx, svgString, {
-        // To handle external styles
         ignoreMouse: true,
         ignoreAnimation: true,
-        ignoreDimensions: true,
-        ignoreClear: true,
     });
     await v.render();
 
-    const dataUrl = canvas.toDataURL('image/png');
-    
-    document.body.removeChild(divToRender);
-
-    return dataUrl;
+    return canvas.toDataURL('image/png');
   }
 
   const handleSaveAsPng = async () => {

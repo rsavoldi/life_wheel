@@ -86,6 +86,7 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                           cy={centerY}
                           r={radius}
                           fill="none"
+                          data-strokecolor="muted-foreground"
                           stroke="hsl(var(--muted-foreground))"
                           strokeWidth="0.5"
                           strokeDasharray="2 4"
@@ -102,6 +103,7 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                               y1={centerY}
                               x2={lineX}
                               y2={lineY}
+                              data-strokecolor="muted-foreground"
                               stroke="hsl(var(--muted-foreground))"
                               strokeWidth="0.5"
                           />
@@ -163,7 +165,8 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                       y={numberY}
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      className="fill-foreground text-lg font-bold opacity-30"
+                      data-fillcolor="foreground"
+                      className="fill-foreground text-sm font-bold opacity-30"
                       transform={`rotate(${-rotation}, ${numberX}, ${numberY})`}
                     >
                       {area.score}
@@ -191,6 +194,7 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                               transform={`rotate(${textRotation}, ${labelX}, ${labelY})`}
                               textAnchor="middle"
                               dominantBaseline="middle"
+                              data-fillcolor="foreground"
                               className="fill-foreground text-xs md:text-sm font-medium"
                           >
                               {area.name}
