@@ -10,6 +10,7 @@ import type { SuggestImprovementsOutput } from '@/ai/flows/suggest-improvements'
 import { AISuggestionsSheet } from './ai-suggestions-sheet';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/hooks/use-i18n';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function LifeWheel() {
   const { t, currentLanguage } = useI18n();
@@ -21,9 +22,12 @@ export default function LifeWheel() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Initialize with default language and update when t function is ready
-    setAreas(getInitialLifeAreas(t));
-  }, [t, currentLanguage]);
+    const initialAreas = getInitialLifeAreas(t).map((area) => ({
+      ...area,
+      id: uuidv4(),
+    }));
+    setAreas(initialAreas);
+  }, [t]);
 
   const handleGetSuggestions = async () => {
     setIsSheetOpen(true);
