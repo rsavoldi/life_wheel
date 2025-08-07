@@ -49,7 +49,7 @@ const prompt = ai.definePrompt({
   - Area: {{this.name}}, Score: {{this.score}}
   {{/each}}
   
-  Please respond using valid JSON format. The keys of the JSON must match the output schema.`, 
+  Please respond using valid JSON format that strictly adheres to the defined output schema. Do not add any extra text or formatting.`, 
 });
 
 const generateActionPlansFlow = ai.defineFlow(

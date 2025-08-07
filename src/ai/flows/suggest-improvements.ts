@@ -54,7 +54,7 @@ For each area, especially those with lower scores, provide:
 1.  **Strategies:** Short, actionable advice based on cognitive-behavioral principles.
 2.  **Activities:** Simple, concrete activities a person can do.
 
-Keep the language simple, clear, and structured. Please respond using valid JSON format.`,
+Keep the language simple, clear, and structured. Please respond using valid JSON format that strictly adheres to the defined output schema. Do not add any extra text or formatting.`,
 });
 
 const suggestImprovementsFlow = ai.defineFlow(

@@ -50,7 +50,10 @@ export function AISuggestionsSheet({
 
   const renderErrorState = () => (
     <div className="p-4">
-      <Alert variant="destructive">
+      <SheetHeader>
+        <SheetTitle>{t('aiSuggestions.title')}</SheetTitle>
+      </SheetHeader>
+      <Alert variant="destructive" className="mt-4">
         <Terminal className="h-4 w-4" />
         <AlertTitle>{t('error.title')}</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
