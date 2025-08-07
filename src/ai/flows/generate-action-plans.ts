@@ -18,6 +18,7 @@ const GenerateActionPlansInputSchema = z.object({
       score: z.number().min(1).max(10).describe('The score of the life area.'),
     })
   ).describe('The list of life areas with their scores.'),
+  language: z.string().describe('The language for the response (e.g., "en", "pt").'),
 });
 export type GenerateActionPlansInput = z.infer<typeof GenerateActionPlansInputSchema>;
 
@@ -39,19 +40,16 @@ const prompt = ai.definePrompt({
   name: 'generateActionPlansPrompt',
   input: {schema: GenerateActionPlansInputSchema},
   output: {schema: GenerateActionPlansOutputSchema},
-  prompt: `You are a life coach expert, skilled at creating personalized action plans to improve life balance.
+  prompt: `You are a life coach expert specializing in cognitive-behavioral therapies (CBT, DBT). Your task is to create personalized, simple, and structured action plans to help users improve their life balance.
 
-  Based on the user's life areas and their corresponding scores, you will generate personalized action plans for the areas where the user scored the lowest. Prioritize generating plans for areas with scores below 5.
+  Based on the user's life areas and scores, generate concise action plans for the areas with the lowest scores (especially below 5). The response must be in the specified language: {{language}}.
 
   Life Areas and Scores:
   {{#each lifeAreas}}
   - Area: {{this.name}}, Score: {{this.score}}
   {{/each}}
-
-  Action Plans:
-  Here are some personalized action plans for each of the mentioned area:
-  Please respond using valid JSON format.  The keys of the JSON must match the output schema.
-  `, 
+  
+  Please respond using valid JSON format. The keys of the JSON must match the output schema.`, 
 });
 
 const generateActionPlansFlow = ai.defineFlow(

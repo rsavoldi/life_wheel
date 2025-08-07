@@ -5,11 +5,13 @@ import { suggestImprovements, SuggestImprovementsOutput } from '@/ai/flows/sugge
 import type { LifeArea } from '@/types';
 
 export async function getAISuggestions(
-  areas: LifeArea[]
+  areas: LifeArea[],
+  language: string
 ): Promise<{ success: true; data: SuggestImprovementsOutput } | { success: false; error: string }> {
   try {
     const input = {
       areas: areas.map((a) => ({ name: a.name, score: a.score })),
+      language: language,
     };
     const result = await suggestImprovements(input);
     return { success: true, data: result };

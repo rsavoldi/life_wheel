@@ -30,7 +30,7 @@ export default function LifeWheel() {
     setError(null);
     setSuggestions(null);
 
-    const result = await getAISuggestions(areas);
+    const result = await getAISuggestions(areas, currentLanguage);
 
     if (result.success) {
       setSuggestions(result.data);

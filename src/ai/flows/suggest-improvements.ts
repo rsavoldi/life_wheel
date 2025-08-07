@@ -1,4 +1,3 @@
-// src/ai/flows/suggest-improvements.ts
 'use server';
 
 /**
@@ -19,6 +18,7 @@ const SuggestImprovementsInputSchema = z.object({
       score: z.number().min(1).max(10).describe('The score for the life area (1-10).'),
     })
   ).describe('An array of life areas with their names and scores.'),
+  language: z.string().describe('The language for the response (e.g., "en", "pt").'),
 });
 export type SuggestImprovementsInput = z.infer<typeof SuggestImprovementsInputSchema>;
 
@@ -26,8 +26,8 @@ const SuggestImprovementsOutputSchema = z.object({
   suggestions: z.array(
     z.object({
       area: z.string().describe('The life area for which the suggestion is provided.'),
-      strategies: z.string().describe('Suggested strategies to improve the score in the area.'),
-      activities: z.string().describe('Specific activities to implement the strategies.'),
+      strategies: z.string().describe('Suggested strategies to improve the score in the area, based on cognitive therapies.'),
+      activities: z.string().describe('Specific, simple activities to implement the strategies.'),
     })
   ).describe('An array of suggestions for each life area.'),
 });
@@ -41,19 +41,20 @@ const prompt = ai.definePrompt({
   name: 'suggestImprovementsPrompt',
   input: {schema: SuggestImprovementsInputSchema},
   output: {schema: SuggestImprovementsOutputSchema},
-  prompt: `You are a life coach expert. Analyze the wheel of life data provided and provide suggestions for strategies and activities to improve the scores in each area.
+  prompt: `You are a life coach expert specializing in cognitive and behavioral therapies (like CBT and DBT). Analyze the wheel of life data and provide suggestions.
+
+The response must be in the specified language: {{language}}.
 
 Wheel of Life Data:
 {{#each areas}}
 - Area: {{name}}, Score: {{score}}
 {{/each}}
 
-Provide specific and actionable strategies and activities for each area to help the user improve their score. Focus on the areas with lower scores.
+For each area, especially those with lower scores, provide:
+1.  **Strategies:** Short, actionable advice based on cognitive-behavioral principles.
+2.  **Activities:** Simple, concrete activities a person can do.
 
-Output the suggestions in a structured format, specifying the area, strategies, and activities. 
-
-Suggestions should be specific to each area and easy to implement.
-`,
+Keep the language simple, clear, and structured. Please respond using valid JSON format.`,
 });
 
 const suggestImprovementsFlow = ai.defineFlow(
