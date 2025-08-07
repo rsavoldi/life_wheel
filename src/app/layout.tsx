@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'Life Compass',
-  description: 'Balance your life with an AI-powered Wheel of Life.',
+  description: 'Equilibre sua vida com a Roda da Vida interativa.',
 };
 
 export default function RootLayout({
