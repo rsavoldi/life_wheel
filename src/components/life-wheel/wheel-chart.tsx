@@ -64,7 +64,7 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
   
   return (
     <div className="w-full max-w-lg aspect-square relative">
-        <svg viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`} className="w-full h-full">
+        <svg viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`} className="w-full h-full" id="life-wheel-svg">
             <defs>
                 {areas.map((area) => (
                     <radialGradient id={`grad-${area.id}`} key={area.id}>
@@ -163,7 +163,7 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                       y={numberY}
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      className="fill-foreground text-xl font-bold opacity-30"
+                      className="fill-foreground text-lg font-bold opacity-30"
                       transform={`rotate(${-rotation}, ${numberX}, ${numberY})`}
                     >
                       {area.score}

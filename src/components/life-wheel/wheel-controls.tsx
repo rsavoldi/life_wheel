@@ -1,7 +1,7 @@
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
-import { Sparkles, Trash2, PlusCircle, Loader2 } from 'lucide-react';
+import { Sparkles, Trash2, PlusCircle, Loader2, Download, FileDown } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import type { LifeArea } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,8 @@ interface WheelControlsProps {
   setAreas: Dispatch<SetStateAction<LifeArea[]>>;
   onGetSuggestions: () => void;
   isGeneratingSuggestions: boolean;
+  onSaveAsPng: () => void;
+  onSaveAsPdf: () => void;
 }
 
 const defaultColors = [
@@ -24,7 +26,7 @@ const defaultColors = [
   '#C9CBCF', '#E7E9ED', '#8A2BE2', '#7FFF00', '#D2691E', '#FF7F50'
 ];
 
-export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingSuggestions }: WheelControlsProps) {
+export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingSuggestions, onSaveAsPng, onSaveAsPdf }: WheelControlsProps) {
   const { t } = useI18n();
 
   const updateArea = (id: string, updatedValues: Partial<LifeArea>) => {
@@ -103,7 +105,7 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
           </div>
         </ScrollArea>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex-col gap-2">
         <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" onClick={onGetSuggestions} disabled={isGeneratingSuggestions}>
           {isGeneratingSuggestions ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -112,15 +114,17 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
           )}
           {t('wheelControls.getSuggestions')}
         </Button>
+        <div className="flex w-full gap-2">
+          <Button variant="outline" className="w-full" onClick={onSaveAsPng}>
+            <Download className="mr-2 h-4 w-4" />
+            PNG
+          </Button>
+          <Button variant="outline" className="w-full" onClick={onSaveAsPdf}>
+            <FileDown className="mr-2 h-4 w-4" />
+            PDF
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );
-}
-
-// Simple uuid v4 implementation to avoid adding a dependency
-function v4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
 }
