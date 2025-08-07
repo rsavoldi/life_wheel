@@ -2,6 +2,9 @@
 
 import type { LifeArea } from '@/types';
 import type { Dispatch, SetStateAction } from 'react';
+import { Button } from '../ui/button';
+import { RefreshCw } from 'lucide-react';
+import { useState } from 'react';
 
 interface WheelChartProps {
   areas: LifeArea[];
@@ -15,15 +18,24 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
   const maxRadius = SVG_SIZE / 2 - 60; // Space for labels
   const numLevels = 10;
   const numSlices = areas.length;
+  const [rotation, setRotation] = useState(0);
+
   if (numSlices === 0) return null;
 
-  const handleSliceClick = (areaId: string) => {
+  const handleScoreChange = (areaId: string, direction: 'increase' | 'decrease') => {
     setAreas((prevAreas) =>
-      prevAreas.map((area) =>
-        area.id === areaId 
-          ? { ...area, score: (area.score + 1) % 11 } 
-          : area
-      )
+      prevAreas.map((area) => {
+        if (area.id === areaId) {
+          let newScore = area.score;
+          if (direction === 'increase') {
+            newScore = Math.min(10, area.score + 1);
+          } else {
+            newScore = Math.max(0, area.score - 1);
+          }
+          return { ...area, score: newScore };
+        }
+        return area;
+      })
     );
   };
   
@@ -51,7 +63,7 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
   };
   
   return (
-    <div className="w-full max-w-lg aspect-square">
+    <div className="w-full max-w-lg aspect-square relative">
         <svg viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`} className="w-full h-full">
             <defs>
                 {areas.map((area) => (
@@ -61,29 +73,29 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                     </radialGradient>
                 ))}
             </defs>
-            {/* Background Grid & Clickable Areas */}
-            <g opacity="0.5">
-                {Array.from({ length: numLevels }).map((_, i) => {
-                  const level = numLevels - i;
-                  const radius = (level / numLevels) * maxRadius;
-                  return (
-                    <circle
-                        key={`level-circle-${i}`}
-                        cx={centerX}
-                        cy={centerY}
-                        r={radius}
-                        fill="none"
-                        stroke="hsl(var(--muted-foreground))"
-                        strokeWidth="0.5"
-                        strokeDasharray="2 4"
-                    />
-                )})}
-                {areas.map((area, index) => {
-                    const angle = (index / numSlices) * 2 * Math.PI - Math.PI / 2;
-                    const lineX = centerX + maxRadius * Math.cos(angle);
-                    const lineY = centerY + maxRadius * Math.sin(angle);
+            <g transform={`rotate(${rotation}, ${centerX}, ${centerY})`} style={{ transition: 'transform 0.5s ease-out' }}>
+              {/* Background Grid & Clickable Areas */}
+              <g opacity="0.5">
+                  {Array.from({ length: numLevels }).map((_, i) => {
+                    const level = numLevels - i;
+                    const radius = (level / numLevels) * maxRadius;
                     return (
-                        <g key={`slice-grid-${area.id}`}>
+                      <circle
+                          key={`level-circle-${i}`}
+                          cx={centerX}
+                          cy={centerY}
+                          r={radius}
+                          fill="none"
+                          stroke="hsl(var(--muted-foreground))"
+                          strokeWidth="0.5"
+                          strokeDasharray="2 4"
+                      />
+                  )})}
+                  {areas.map((_, index) => {
+                      const angle = (index / numSlices) * 2 * Math.PI - Math.PI / 2;
+                      const lineX = centerX + maxRadius * Math.cos(angle);
+                      const lineY = centerY + maxRadius * Math.sin(angle);
+                      return (
                           <line
                               key={`divider-${index}`}
                               x1={centerX}
@@ -93,56 +105,84 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                               stroke="hsl(var(--muted-foreground))"
                               strokeWidth="0.5"
                           />
-                          {/* Clickable regions */}
-                           <path
-                              d={getPathForSlice(index, 10)}
-                              fill="transparent"
-                              className="cursor-pointer"
-                              onClick={() => handleSliceClick(area.id)}
-                            />
-                        </g>
-                    );
-                })}
-            </g>
-            
-            {/* Scored Slices */}
-            <g pointerEvents="none">
-                {areas.map((area, index) => (
-                    <path
-                        key={`slice-path-${area.id}`}
-                        d={getPathForSlice(index, area.score)}
-                        fill={`url(#grad-${area.id})`}
-                        stroke={area.color}
-                        strokeWidth="1.5"
-                        style={{transition: 'd 0.3s ease-in-out'}}
-                    />
-                ))}
-            </g>
+                      );
+                  })}
+              </g>
+              
+              {/* Clickable areas */}
+              {areas.map((area, index) => (
+                <g key={`clickable-slice-${area.id}`}>
+                  {/* Increase score area */}
+                  <path
+                    d={getPathForSlice(index, 10)}
+                    fill="transparent"
+                    className="cursor-pointer"
+                    onClick={() => handleScoreChange(area.id, 'increase')}
+                  />
+                   {/* Decrease score area */}
+                  <path
+                    d={getPathForSlice(index, area.score)}
+                    fill="transparent"
+                    className="cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent click from bubbling to the increase area
+                      handleScoreChange(area.id, 'decrease');
+                    }}
+                  />
+                </g>
+              ))}
 
-            {/* Labels */}
-            <g pointerEvents="none">
-                {areas.map((area, index) => {
-                    const sliceAngle = (2 * Math.PI) / numSlices;
-                    const midAngle = (index + 0.5) * sliceAngle - Math.PI / 2;
-                    const labelRadius = maxRadius + 30;
-                    const labelX = centerX + labelRadius * Math.cos(midAngle);
-                    const labelY = centerY + labelRadius * Math.sin(midAngle);
+              {/* Scored Slices */}
+              <g pointerEvents="none">
+                  {areas.map((area, index) => (
+                      <path
+                          key={`slice-path-${area.id}`}
+                          d={getPathForSlice(index, area.score)}
+                          fill={`url(#grad-${area.id})`}
+                          stroke={area.color}
+                          strokeWidth="1.5"
+                          style={{transition: 'd 0.3s ease-in-out'}}
+                      />
+                  ))}
+              </g>
 
-                    return (
-                        <text
-                            key={`label-${area.id}`}
-                            x={labelX}
-                            y={labelY}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            className="fill-foreground text-xs md:text-sm font-medium"
-                        >
-                            {area.name}
-                        </text>
-                    );
-                })}
+              {/* Labels */}
+              <g pointerEvents="none">
+                  {areas.map((area, index) => {
+                      const sliceAngle = (2 * Math.PI) / numSlices;
+                      const midAngle = (index + 0.5) * sliceAngle - Math.PI / 2;
+                      const labelRadius = maxRadius + 30;
+                      const labelX = centerX + labelRadius * Math.cos(midAngle);
+                      const labelY = centerY + labelRadius * Math.sin(midAngle);
+                      
+                      const textRotation = (midAngle * 180) / Math.PI + 90;
+                      
+                      return (
+                          <text
+                              key={`label-${area.id}`}
+                              x={labelX}
+                              y={labelY}
+                              transform={`rotate(${textRotation}, ${labelX}, ${labelY})`}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              className="fill-foreground text-xs md:text-sm font-medium"
+                          >
+                              {area.name}
+                          </text>
+                      );
+                  })}
+              </g>
             </g>
         </svg>
+        <Button
+            variant="outline"
+            size="icon"
+            className="absolute bottom-4 right-4 rounded-full shadow-lg"
+            onClick={() => setRotation(r => r + (360 / numSlices))}
+        >
+            <RefreshCw className="h-5 w-5" />
+            <span className="sr-only">Rotate Wheel</span>
+        </Button>
     </div>
   );
 }
