@@ -59,18 +59,48 @@ export default function LifeWheel() {
     const svgElement = wheelChartRef.current.querySelector('svg');
     if (!svgElement) return null;
     
-    const svgString = new XMLSerializer().serializeToString(svgElement);
+    // Create a clone of the div to avoid modifying the one in the DOM
+    const divToRender = wheelChartRef.current.cloneNode(true) as HTMLDivElement;
+    
+    // Apply styles to ensure it has a background
+    divToRender.style.backgroundColor = 'white';
+    divToRender.style.width = `${wheelChartRef.current.offsetWidth}px`;
+    divToRender.style.height = `${wheelChartRef.current.offsetHeight}px`;
+    divToRender.style.position = 'absolute';
+    divToRender.style.left = '-9999px'; // Render offscreen
+    
+    document.body.appendChild(divToRender);
+
+    const svgString = new XMLSerializer().serializeToString(divToRender.querySelector('svg')!);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-
-    canvas.width = svgElement.width.baseVal.value;
-    canvas.height = svgElement.height.baseVal.value;
+    if (!ctx) {
+        document.body.removeChild(divToRender);
+        return null;
+    }
     
-    const v = await Canvg.from(ctx, svgString);
+    const computedStyle = getComputedStyle(wheelChartRef.current);
+    canvas.width = wheelChartRef.current.offsetWidth;
+    canvas.height = wheelChartRef.current.offsetHeight;
+    
+    // Draw white background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const v = await Canvg.from(ctx, svgString, {
+        // To handle external styles
+        ignoreMouse: true,
+        ignoreAnimation: true,
+        ignoreDimensions: true,
+        ignoreClear: true,
+    });
     await v.render();
 
-    return canvas.toDataURL('image/png');
+    const dataUrl = canvas.toDataURL('image/png');
+    
+    document.body.removeChild(divToRender);
+
+    return dataUrl;
   }
 
   const handleSaveAsPng = async () => {
