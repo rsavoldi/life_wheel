@@ -20,24 +20,16 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Locale>('en');
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    const browserLang = navigator.language.split('-')[0] as Locale;
+    if (translations[browserLang]) {
+      setLanguage(browserLang);
+    }
   }, []);
 
-  useEffect(() => {
-    if (isMounted) {
-      const browserLang = navigator.language.split('-')[0] as Locale;
-      if (translations[browserLang]) {
-        setLanguage(browserLang);
-      }
-    }
-  }, [isMounted]);
-
   const t = useCallback((key: string, options?: Record<string, string>) => {
-    // On the server or before hydration, always use the default language
-    const langToUse = isMounted ? language : 'en';
+    const langToUse = language;
     const keys = key.split('.');
     let result: any = translations[langToUse];
     for (const k of keys) {
@@ -60,13 +52,40 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     return result || key;
-  }, [language, isMounted]);
+  }, [language]);
   
   const handleSetLanguage = (lang: Locale) => {
-    if (isMounted) {
-      setLanguage(lang);
-    }
+    setLanguage(lang);
   };
+
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    // Render a placeholder or nothing on the server/first render
+    // to avoid hydration mismatch.
+    const tServer = (key: string): string => {
+       const keys = key.split('.');
+       let result: any = translations['en'];
+       for (const k of keys) {
+         result = result?.[k];
+         if (result === undefined) return key;
+       }
+       return result;
+    }
+    const serverContext = {
+      t: tServer,
+      setLanguage: () => {},
+      currentLanguage: 'en' as Locale,
+    };
+    return (
+      <I18nContext.Provider value={serverContext}>
+        {children}
+      </I18nContext.Provider>
+    );
+  }
 
   return (
     <I18nContext.Provider value={{ t, setLanguage: handleSetLanguage, currentLanguage: language }}>
