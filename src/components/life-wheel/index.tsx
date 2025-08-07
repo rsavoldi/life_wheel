@@ -21,6 +21,7 @@ export default function LifeWheel() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Initialize with default language and update when t function is ready
     setAreas(getInitialLifeAreas(t));
   }, [t, currentLanguage]);
 
@@ -49,7 +50,7 @@ export default function LifeWheel() {
     <div className="container mx-auto p-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-2 flex items-center justify-center min-h-[50vh] lg:min-h-[80vh] p-4 bg-card rounded-xl shadow-md">
-          <WheelChart areas={areas} setAreas={setAreas} />
+          <WheelChart areas={areas} setAreas={setAreas} key={`wheel-${currentLanguage}`} />
         </div>
         <div className="lg:col-span-1">
           <WheelControls
@@ -57,6 +58,7 @@ export default function LifeWheel() {
             setAreas={setAreas}
             onGetSuggestions={handleGetSuggestions}
             isGeneratingSuggestions={isLoading}
+            key={`controls-${currentLanguage}`}
           />
         </div>
       </div>

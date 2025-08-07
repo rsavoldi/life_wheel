@@ -20,21 +20,36 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Locale>('en');
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const browserLang = navigator.language.split('-')[0] as Locale;
-    if (translations[browserLang]) {
-      setLanguage(browserLang);
-    }
+    setIsMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (isMounted) {
+      const browserLang = navigator.language.split('-')[0] as Locale;
+      if (translations[browserLang]) {
+        setLanguage(browserLang);
+      }
+    }
+  }, [isMounted]);
+
   const t = useCallback((key: string, options?: Record<string, string>) => {
+    // On the server or before hydration, always use the default language
+    const langToUse = isMounted ? language : 'en';
     const keys = key.split('.');
-    let result: any = translations[language];
+    let result: any = translations[langToUse];
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        return key;
+        // Fallback to English if key not found in current language
+        let fallbackResult: any = translations['en'];
+        for (const fk of keys) {
+          fallbackResult = fallbackResult?.[fk];
+          if (fallbackResult === undefined) return key;
+        }
+        return fallbackResult || key;
       }
     }
 
@@ -45,10 +60,16 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     return result || key;
-  }, [language]);
+  }, [language, isMounted]);
+  
+  const handleSetLanguage = (lang: Locale) => {
+    if (isMounted) {
+      setLanguage(lang);
+    }
+  };
 
   return (
-    <I18nContext.Provider value={{ t, setLanguage, currentLanguage: language }}>
+    <I18nContext.Provider value={{ t, setLanguage: handleSetLanguage, currentLanguage: language }}>
       {children}
     </I18nContext.Provider>
   );
