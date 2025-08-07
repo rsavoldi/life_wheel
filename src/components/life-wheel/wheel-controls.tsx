@@ -77,7 +77,10 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <Label htmlFor={`score-${area.id}`}>{t('wheelControls.score')}</Label>
-                    <span className="text-sm font-bold w-8 h-8 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <span 
+                      className="text-sm font-bold w-8 h-8 flex items-center justify-center rounded-full text-white"
+                      style={{ backgroundColor: area.color }}
+                    >
                       {area.score}
                     </span>
                   </div>
@@ -88,6 +91,7 @@ export function WheelControls({ areas, setAreas, onGetSuggestions, isGeneratingS
                     step={1}
                     value={[area.score]}
                     onValueChange={([value]) => updateArea(area.id, { score: value })}
+                    style={{ '--slider-color': area.color } as React.CSSProperties}
                   />
                 </div>
               </div>

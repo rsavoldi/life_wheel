@@ -163,7 +163,7 @@ export function WheelChart({ areas, setAreas }: WheelChartProps) {
                       y={numberY}
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      className="fill-foreground text-2xl font-bold opacity-30"
+                      className="fill-foreground text-xl font-bold opacity-30"
                       transform={`rotate(${-rotation}, ${numberX}, ${numberY})`}
                     >
                       {area.score}
